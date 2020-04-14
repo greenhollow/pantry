@@ -1,17 +1,39 @@
 {
+    "name": "greenhollow/pantry",
+    "description": "Service management web application for food pantry",
     "type": "project",
-    "license": "proprietary",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Israel J. Carberry",
+            "email": "israel@greenhollowtech.com"
+        }
+    ],
     "require": {
         "php": "^7.2.5",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "sensio/framework-extra-bundle": "^5.5",
         "symfony/console": "5.0.*",
         "symfony/dotenv": "5.0.*",
         "symfony/flex": "^1.3.1",
         "symfony/framework-bundle": "5.0.*",
+        "symfony/monolog-bundle": "^3.5",
+        "symfony/translation": "5.0.*",
+        "symfony/twig-pack": "^1.0",
+        "symfony/webpack-encore-bundle": "^1.7",
         "symfony/yaml": "5.0.*"
     },
     "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "phpstan/phpstan": "^0.12.18",
+        "phpstan/phpstan-doctrine": "^0.12.10",
+        "phpstan/phpstan-phpunit": "^0.12.7",
+        "phpstan/phpstan-symfony": "^0.12.5",
+        "sensiolabs/security-checker": "^6.0",
+        "symfony/browser-kit": "5.0.*",
+        "symfony/debug-pack": "^1.0",
+        "symfony/phpunit-bridge": "^5.0"
     },
     "config": {
         "preferred-install": {
@@ -21,12 +43,12 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "GreenHollow\\Pantry\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\Tests\\": "tests/"
+            "GreenHollow\\Pantry\\Tests\\": "tests/"
         }
     },
     "replace": {
@@ -41,8 +63,16 @@
     "scripts": {
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "security-checker security:check": "script"
         },
+        "check": [
+            "vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run --diff",
+            "vendor/bin/phpstan analyse src tests"
+        ],
+        "fix": [
+            "vendor/bin/php-cs-fixer fix --allow-risky=yes"
+        ],
         "post-install-cmd": [
             "@auto-scripts"
         ],

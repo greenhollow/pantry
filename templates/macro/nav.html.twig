@@ -1,0 +1,23 @@
+{% macro nav_start() %}
+    <nav class="nav">
+{% endmacro nav_start %}
+
+{% macro nav_item(navContent, navLink, navActive, navClass) %}
+    <a class="nav-link {{ navActive ? 'active' : '' }} {{ navClass }}" href="{{ navLink }}">
+        {{ navContent }}
+    </a>
+{% endmacro nav_item %}
+
+{% macro nav_end() %}
+    </nav>
+{% endmacro nav_end %}
+
+{% macro main(currentPage) %}
+    {{ _self.nav_start() }}
+    {{ _self.nav_item(
+        'nav.home'|trans,
+        path('public_home'),
+        currentPage == 'public_home'
+    ) }}
+    {{ _self.nav_end() }}
+{% endmacro main %}

@@ -1,0 +1,9 @@
+includes:
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
+    - vendor/phpstan/phpstan-symfony/extension.neon
+parameters:
+    autoload_files:
+        - '%rootDir%/../../../bin/.phpunit/phpunit-7.5-0/vendor/autoload.php'
+    level: 8
