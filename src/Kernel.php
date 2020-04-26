@@ -15,6 +15,18 @@ class Kernel extends BaseKernel
 
     private const CONFIG_EXTS = '.{php,xml,yaml,yml}';
 
+    public function boot()
+    {
+        parent::boot();
+
+        // if database platform is any SQLServer version, register timestamp as
+        // a string type column
+        $databasePlatform = $this->container->get('doctrine.orm.entity_manager')->getConnection()->getDatabasePlatform();
+        if (false !== strpos(get_class($databasePlatform), '\SQLServer')) {
+            $databasePlatform->registerDoctrineTypeMapping('timestamp', 'datetime');
+        }
+    }
+
     public function registerBundles(): iterable
     {
         $contents = require $this->getProjectDir().'/config/bundles.php';
