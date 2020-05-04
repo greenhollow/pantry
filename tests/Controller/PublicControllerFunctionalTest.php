@@ -11,8 +11,8 @@ class PublicControllerFunctionalTest extends BaseFunctionalTestCase
      */
     public function testHomeAction(): void
     {
-        $this->client->request('GET', '/');
+        self::$client->request('GET', '/');
 
-        $this->assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertSame(200, self::$client->getResponse()->getStatusCode());
     }
 }

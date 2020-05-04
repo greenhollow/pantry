@@ -7,6 +7,7 @@ use GreenHollow\Pantry\Entity\Household;
 
 /**
  * @ORM\Entity(repositoryClass="GreenHollow\Pantry\Repository\Aggregate\HouseholdAggregateRepository")
+ * @ORM\HasLifecycleCallbacks
  */
 class HouseholdAggregate
 {
@@ -112,7 +113,7 @@ class HouseholdAggregate
      * Normalize any aggregate discrepancies into unknowns.
      *
      * @ORM\PrePersist
-     * @ORM\Update
+     * @ORM\PreUpdate
      */
     public function normalize(): void
     {

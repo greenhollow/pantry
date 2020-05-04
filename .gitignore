@@ -1,3 +1,5 @@
+# the Migrations directory is managed outside of this project
+/src/Migrations/*.php
 
 ###> symfony/framework-bundle ###
 /.env.local

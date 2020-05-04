@@ -2,21 +2,27 @@
 
 namespace GreenHollow\Pantry\Tests;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class BaseFunctionalTestCase extends WebTestCase
 {
-    /**
-     * @var \Symfony\Bundle\FrameworkBundle\KernelBrowser
-     */
-    protected $client;
+    protected static ?KernelBrowser $client = null;
+    protected static ?EntityManagerInterface $entityManager = null;
 
     /**
      * {@inheritdoc}
      */
     public function setUp(): void
     {
-        $this->client = static::createClient();
+        if (null === self::$client) {
+            self::$client = static::createClient();
+        }
+
+        if (null === self::$entityManager) {
+            self::$entityManager = self::$container->get(EntityManagerInterface::class);
+        }
     }
 
     /**
@@ -24,6 +30,5 @@ class BaseFunctionalTestCase extends WebTestCase
      */
     public function tearDown(): void
     {
-        unset($this->client);
     }
 }

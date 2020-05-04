@@ -3,10 +3,11 @@
 namespace GreenHollow\Pantry\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * @ORM\Entity(repositoryClass="GreenHollow\Pantry\Repository\ClientRepository")
+ * @ORM\HasLifecycleCallbacks
  */
 class Client implements RecipientInterface
 {
@@ -57,13 +58,11 @@ class Client implements RecipientInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Choice(callback="getStatuses")
      */
     private $status;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Choice(callback="getRelations")
      */
     private $relationship;
 
@@ -99,9 +98,20 @@ class Client implements RecipientInterface
 
     /**
      * @ORM\ManyToOne(targetEntity="GreenHollow\Pantry\Entity\Household", inversedBy="clients")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $household;
+
+    /**
+     * Construct with optional household.
+     */
+    public function __construct(?Household $household = null, string $relationship = null)
+    {
+        if ($household instanceof Household) {
+            $household->addClient($this);
+        }
+        $this->relationship = $relationship ?? self::RELATION_UNKNOWN;
+        $this->status = self::STATUS_ENABLED;
+    }
 
     /**
      * Get all valid relations.
@@ -131,6 +141,27 @@ class Client implements RecipientInterface
             self::STATUS_DISABLED,
             self::STATUS_ENABLED,
         ];
+    }
+
+    /**
+     * Validate the entity state.
+     *
+     * @throws ConstraintDefinitionException
+     *
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function validate(): void
+    {
+        // check relationship value
+        if (!in_array($this->relationship, self::getRelations())) {
+            throw new ConstraintDefinitionException(sprintf('Invalid relationship "%s" in %s; must be one of: %s', $this->relationship, get_class(), implode(', ', self::getRelations())));
+        }
+
+        // check status value
+        if (!in_array($this->status, self::getStatuses())) {
+            throw new ConstraintDefinitionException(sprintf('Invalid status "%s" in %s; must be one of: %s', $this->status, get_class(), implode(', ', self::getStatuses())));
+        }
     }
 
     public function getId(): ?int

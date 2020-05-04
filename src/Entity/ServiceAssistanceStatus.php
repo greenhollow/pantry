@@ -3,10 +3,11 @@
 namespace GreenHollow\Pantry\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * @ORM\Entity(repositoryClass="GreenHollow\Pantry\Repository\ServiceAssistanceStatusRepository")
+ * @ORM\HasLifecycleCallbacks
  */
 class ServiceAssistanceStatus
 {
@@ -35,7 +36,6 @@ class ServiceAssistanceStatus
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Choice(callback="getStatuses")
      */
     private $status;
 
@@ -59,6 +59,22 @@ class ServiceAssistanceStatus
             self::STATUS_HOLD,
             self::STATUS_PROCESS,
         ];
+    }
+
+    /**
+     * Validate the entity state.
+     *
+     * @throws ConstraintDefinitionException
+     *
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function validate(): void
+    {
+        // check status value
+        if (!in_array($this->status, self::getStatuses())) {
+            throw new ConstraintDefinitionException(sprintf('Invalid status "%s" in %s; must be one of: %s', $this->status, get_class(), implode(', ', self::getStatuses())));
+        }
     }
 
     public function getId(): ?int

@@ -14,6 +14,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "doctrine/annotations": "^1.10",
+        "ocramius/package-versions": "1.4.2",
         "sensio/framework-extra-bundle": "^5.5",
         "symfony/console": "5.0.*",
         "symfony/dotenv": "5.0.*",
@@ -28,6 +29,8 @@
         "symfony/yaml": "5.0.*"
     },
     "require-dev": {
+        "dama/doctrine-test-bundle": "^6.3",
+        "doctrine/doctrine-fixtures-bundle": "^3.3",
         "friendsofphp/php-cs-fixer": "^2.16",
         "phpstan/phpstan": "^0.12.18",
         "phpstan/phpstan-doctrine": "^0.12.10",
@@ -37,7 +40,8 @@
         "symfony/browser-kit": "5.0.*",
         "symfony/debug-pack": "^1.0",
         "symfony/maker-bundle": "^1.15",
-        "symfony/phpunit-bridge": "^5.0"
+        "symfony/phpunit-bridge": "^5.0",
+        "symfony/test-pack": "^1.0"
     },
     "config": {
         "preferred-install": {
@@ -74,8 +78,15 @@
             "vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run --diff",
             "vendor/bin/phpstan analyse src tests"
         ],
+        "wincheck": [
+            "vendor\\bin\\php-cs-fixer.bat fix --allow-risky=yes --dry-run --diff",
+            "vendor\\bin\\phpstan.bat analyse src tests"
+        ],
         "fix": [
             "vendor/bin/php-cs-fixer fix --allow-risky=yes"
+        ],
+        "winfix": [
+            "vendor\\bin\\php-cs-fixer.bat fix --allow-risky=yes"
         ],
         "post-install-cmd": [
             "@auto-scripts"

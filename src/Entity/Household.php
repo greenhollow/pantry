@@ -2,12 +2,15 @@
 
 namespace GreenHollow\Pantry\Entity;
 
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Exception\LogicException;
 
 /**
  * @ORM\Entity(repositoryClass="GreenHollow\Pantry\Repository\HouseholdRepository")
+ * @ORM\HasLifecycleCallbacks
  */
 class Household implements RecipientInterface
 {
@@ -68,6 +71,37 @@ class Household implements RecipientInterface
     public function __construct()
     {
         $this->clients = new ArrayCollection();
+    }
+
+    /**
+     * Validate the entity state.
+     *
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function validate(): void
+    {
+        if (null === $this->created) {
+            $this->created = new DateTime();
+        }
+        $this->updated = new DateTime();
+
+        // if there are no clients, there is nothing to validate
+        if (0 === $this->clients->count()) {
+            return;
+        }
+
+        // filter for enabled primary client
+        $clients = $this->clients->filter(function ($client) {
+            return Client::RELATION_PRIMARY === $client->getRelationship()
+                && Client::STATUS_ENABLED === $client->getStatus()
+            ;
+        });
+
+        // if not exactly one match, household is invalid
+        if (1 !== $clients->count()) {
+            throw new LogicException(sprintf('Invalid %s; related %s list must have exactly one of "%s" relationship enabled, found %d!', Household::class, Client::class, Client::RELATION_PRIMARY, $clients->count()));
+        }
     }
 
     public function getId(): ?int

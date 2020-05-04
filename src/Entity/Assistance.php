@@ -4,10 +4,12 @@ namespace GreenHollow\Pantry\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\LogicException;
 
 /**
  * @ORM\Entity(repositoryClass="GreenHollow\Pantry\Repository\AssistanceRepository")
+ * @ORM\HasLifecycleCallbacks
  */
 class Assistance
 {
@@ -40,7 +42,6 @@ class Assistance
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Choice(callback="getTypes")
      */
     private $type;
 
@@ -67,6 +68,22 @@ class Assistance
     }
 
     /**
+     * Disable this assistance type.
+     *
+     * @throws LogicException
+     */
+    public function disable(): self
+    {
+        if (null !== $this->disabled) {
+            throw new LogicException(sprintf('%s is already disabled!', get_class()));
+        }
+
+        $this->disabled = new DateTime();
+
+        return $this;
+    }
+
+    /**
      * Get all valid types.
      */
     public static function getTypes(): array
@@ -79,6 +96,38 @@ class Assistance
             self::TYPE_VETERANS,
             self::TYPE_WIC,
         ];
+    }
+
+    /**
+     * Check if this assistance is disabled.
+     */
+    public function isDisabled(): bool
+    {
+        return $this->disabled instanceof DateTime;
+    }
+
+    /**
+     * Check if this assistance is enabled.
+     */
+    public function isEnabled(): bool
+    {
+        return is_null($this->disabled);
+    }
+
+    /**
+     * Validate client state.
+     *
+     * @throws ConstraintDefinitionException
+     *
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function validate(): void
+    {
+        // check type value
+        if (!in_array($this->type, self::getTypes())) {
+            throw new ConstraintDefinitionException(sprintf('Invalid type "%s" in %s; must be one of: %s', $this->type, get_class(), implode(', ', self::getTypes())));
+        }
     }
 
     public function getId(): ?int
