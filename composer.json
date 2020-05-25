@@ -14,6 +14,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "doctrine/annotations": "^1.10",
+        "jms/serializer-bundle": "^3.6",
         "ocramius/package-versions": "1.4.2",
         "sensio/framework-extra-bundle": "^5.5",
         "symfony/console": "5.0.*",
