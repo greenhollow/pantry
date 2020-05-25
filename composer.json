@@ -16,6 +16,7 @@
         "doctrine/annotations": "^1.10",
         "friendsofsymfony/rest-bundle": "dev-master#3.0.0-beta2",
         "jms/serializer-bundle": "^3.6",
+        "nelmio/api-doc-bundle": "^3.6",
         "ocramius/package-versions": "1.8",
         "ocramius/proxy-manager": "2.8",
         "sensio/framework-extra-bundle": "^5.5",
