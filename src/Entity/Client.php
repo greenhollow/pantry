@@ -2,8 +2,11 @@
 
 namespace GreenHollow\Pantry\Entity;
 
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use GreenHollow\Pantry\Dto\ClientDto;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use UnexpectedValueException;
 
 /**
  * @ORM\Entity(repositoryClass="GreenHollow\Pantry\Repository\ClientRepository")
@@ -40,6 +43,8 @@ class Client implements RecipientInterface
     const STATUS_ENABLED = 'enabled';
 
     /**
+     * @var int
+     *
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
@@ -47,56 +52,86 @@ class Client implements RecipientInterface
     private $id;
 
     /**
+     * @var string
+     *
+     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\Column(type="guid")
+     */
+    private $uuid;
+
+    /**
+     * @var DateTimeInterface
+     *
      * @ORM\Column(type="datetimetz")
      */
     private $created;
 
     /**
+     * @var DateTimeInterface
+     *
      * @ORM\Column(type="datetimetz")
      */
     private $updated;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=255)
      */
     private $status;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=255)
      */
     private $relationship;
 
     /**
+     * @var string|null
+     *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $firstName;
 
     /**
+     * @var string|null
+     *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $lastName;
 
     /**
+     * @var DateTimeInterface
+     *
      * @ORM\Column(type="date", nullable=true)
      */
     private $dob;
 
     /**
+     * @var string|null
+     *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $gender;
 
     /**
+     * @var bool
+     *
      * @ORM\Column(type="boolean")
      */
     private $allergic;
 
     /**
+     * @var bool
+     *
      * @ORM\Column(type="boolean")
      */
     private $diabetic;
 
     /**
+     * @var Household
+     *
      * @ORM\ManyToOne(targetEntity="GreenHollow\Pantry\Entity\Household", inversedBy="clients")
      */
     private $household;
@@ -111,6 +146,8 @@ class Client implements RecipientInterface
         }
         $this->relationship = $relationship ?? self::RELATION_UNKNOWN;
         $this->status = self::STATUS_ENABLED;
+        $this->allergic = false;
+        $this->diabetic = false;
     }
 
     /**
@@ -144,6 +181,43 @@ class Client implements RecipientInterface
     }
 
     /**
+     * Update from a DTO.  Null values will be ignored unless the DTO was
+     * instantiated from this entity.
+     *
+     * @throws UnexpectedValueException
+     */
+    public function update(ClientDto $dto): self
+    {
+        // if the uuid is set, all properties should be updated from the DTO,
+        // even nulls, as the DTO was created from this client
+        $updateAll = !is_null($dto->getUuid());
+
+        // if set, the UUID must match
+        if ($updateAll && $dto->getUuid() !== $this->uuid) {
+            throw new UnexpectedValueException('Attempting to update a client from another instance is not allowed.');
+        }
+
+        // iterate over the updateable properties
+        foreach ([
+            'allergic',
+            'diabetic',
+            'dob',
+            'firstName',
+            'gender',
+            'household',
+            'lastName',
+            'relationship',
+            'status',
+        ] as $property) {
+            if ($updateAll || !is_null($dto->$property)) {
+                $this->$property = $dto->$property;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Validate the entity state.
      *
      * @throws ConstraintDefinitionException
@@ -169,28 +243,19 @@ class Client implements RecipientInterface
         return $this->id;
     }
 
-    public function getCreated(): ?\DateTimeInterface
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
+    }
+
+    public function getCreated(): ?DateTimeInterface
     {
         return $this->created;
     }
 
-    public function setCreated(\DateTimeInterface $created): self
-    {
-        $this->created = $created;
-
-        return $this;
-    }
-
-    public function getUpdated(): ?\DateTimeInterface
+    public function getUpdated(): ?DateTimeInterface
     {
         return $this->updated;
-    }
-
-    public function setUpdated(\DateTimeInterface $updated): self
-    {
-        $this->updated = $updated;
-
-        return $this;
     }
 
     public function getStatus(): ?string
@@ -198,23 +263,9 @@ class Client implements RecipientInterface
         return $this->status;
     }
 
-    public function setStatus(string $status): self
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
-    public function getRelationship(): ?string
+    public function getRelationship(): string
     {
         return $this->relationship;
-    }
-
-    public function setRelationship(string $relationship): self
-    {
-        $this->relationship = $relationship;
-
-        return $this;
     }
 
     public function getFirstName(): ?string
@@ -222,35 +273,14 @@ class Client implements RecipientInterface
         return $this->firstName;
     }
 
-    public function setFirstName(?string $firstName): self
-    {
-        $this->firstName = $firstName;
-
-        return $this;
-    }
-
     public function getLastName(): ?string
     {
         return $this->lastName;
     }
 
-    public function setLastName(?string $lastName): self
-    {
-        $this->lastName = $lastName;
-
-        return $this;
-    }
-
-    public function getDob(): ?\DateTimeInterface
+    public function getDob(): ?DateTimeInterface
     {
         return $this->dob;
-    }
-
-    public function setDob(?\DateTimeInterface $dob): self
-    {
-        $this->dob = $dob;
-
-        return $this;
     }
 
     public function getGender(): ?string
@@ -258,23 +288,9 @@ class Client implements RecipientInterface
         return $this->gender;
     }
 
-    public function setGender(?string $gender): self
-    {
-        $this->gender = $gender;
-
-        return $this;
-    }
-
     public function getAllergic(): ?bool
     {
         return $this->allergic;
-    }
-
-    public function setAllergic(bool $allergic): self
-    {
-        $this->allergic = $allergic;
-
-        return $this;
     }
 
     public function getDiabetic(): ?bool
@@ -282,22 +298,8 @@ class Client implements RecipientInterface
         return $this->diabetic;
     }
 
-    public function setDiabetic(bool $diabetic): self
-    {
-        $this->diabetic = $diabetic;
-
-        return $this;
-    }
-
     public function getHousehold(): ?Household
     {
         return $this->household;
-    }
-
-    public function setHousehold(?Household $household): self
-    {
-        $this->household = $household;
-
-        return $this;
     }
 }
