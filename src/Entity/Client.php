@@ -31,6 +31,7 @@ class Client implements RecipientInterface
     const RELATION_CHILD = 'child';
     const RELATION_FAMILY = 'family';
     const RELATION_FOSTER_CHILD = 'foster';
+    const RELATION_INDIVIDUAL = 'self';
     const RELATION_OTHER = 'other';
     const RELATION_PARENT = 'parent';
     const RELATION_PRIMARY = 'primary';
@@ -82,14 +83,14 @@ class Client implements RecipientInterface
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=10)
      */
     private $status;
 
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=8)
      */
     private $relationship;
 
@@ -117,7 +118,7 @@ class Client implements RecipientInterface
     /**
      * @var string|null
      *
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=1, nullable=true)
      */
     private $gender;
 
@@ -147,10 +148,14 @@ class Client implements RecipientInterface
      */
     public function __construct(?Household $household = null, string $relationship = null)
     {
+        $this->relationship = $relationship ?? self::RELATION_UNKNOWN;
+
         if ($household instanceof Household) {
             $household->addClient($this);
+        } else {
+            $this->relationship = self::RELATION_INDIVIDUAL;
         }
-        $this->relationship = $relationship ?? self::RELATION_UNKNOWN;
+
         $this->status = self::STATUS_ENABLED;
         $this->allergic = false;
         $this->diabetic = false;
@@ -176,6 +181,7 @@ class Client implements RecipientInterface
             self::RELATION_CHILD,
             self::RELATION_FAMILY,
             self::RELATION_FOSTER_CHILD,
+            self::RELATION_INDIVIDUAL,
             self::RELATION_OTHER,
             self::RELATION_PARENT,
             self::RELATION_PRIMARY,
@@ -229,6 +235,16 @@ class Client implements RecipientInterface
             if ($updateAll || !is_null($dto->$property)) {
                 $this->$property = $dto->$property;
             }
+        }
+
+        // enforce the proper relationship for a client not in a household
+        if (!($this->household instanceof Household)) {
+            $this->relationship = self::RELATION_INDIVIDUAL;
+        }
+
+        // otherwise, enforce non-self relationship when not an individual
+        elseif (self::RELATION_INDIVIDUAL === $this->relationship) {
+            $this->relationship = self::RELATION_UNKNOWN;
         }
 
         return $this;

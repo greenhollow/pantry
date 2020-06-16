@@ -2,6 +2,7 @@
 
 namespace GreenHollow\Pantry\Tests\Entity;
 
+use GreenHollow\Pantry\Dto\ClientDto;
 use GreenHollow\Pantry\Entity\Client;
 use GreenHollow\Pantry\Tests\BaseFunctionalTestCase;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -14,14 +15,13 @@ class ClientFunctionalTest extends BaseFunctionalTestCase
     public function testValidateWithValidRelationship(): void
     {
         // create a client with a valid relationship
-        $client = new Client();
-        $client->setRelationship(Client::RELATION_PRIMARY);
+        $client = new Client(null, Client::RELATION_INDIVIDUAL);
 
         // trigger the validation
         self::$entityManager->persist($client);
 
         // confirm no exception occurred
-        $this->assertSame('primary', $client->getRelationship());
+        $this->assertSame('self', $client->getRelationship());
     }
 
     /**
@@ -35,8 +35,7 @@ class ClientFunctionalTest extends BaseFunctionalTestCase
         $this->expectExceptionMessage('Invalid relationship "bff" in GreenHollow\Pantry\Entity\Client; must be one of:');
 
         // create a client with an invalid relationship
-        $client = new Client();
-        $client->setRelationship('bff');
+        $client = new Client(null, 'bff');
 
         // trigger the exception
         self::$entityManager->persist($client);
@@ -49,7 +48,9 @@ class ClientFunctionalTest extends BaseFunctionalTestCase
     {
         // create a client with a valid status
         $client = new Client();
-        $client->setStatus(Client::STATUS_AUTHORIZED);
+        $clientDto = ClientDto::create($client);
+        $clientDto->status = Client::STATUS_AUTHORIZED;
+        $client->update($clientDto);
 
         // trigger the validation
         self::$entityManager->persist($client);
@@ -70,7 +71,9 @@ class ClientFunctionalTest extends BaseFunctionalTestCase
 
         // create a client with an invalid status
         $client = new Client();
-        $client->setStatus('lost');
+        $clientDto = ClientDto::create($client);
+        $clientDto->status = 'lost';
+        $client->update($clientDto);
 
         // trigger the exception
         self::$entityManager->persist($client);

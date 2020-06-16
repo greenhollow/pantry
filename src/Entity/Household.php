@@ -6,6 +6,7 @@ use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use GreenHollow\Pantry\Dto\ClientDto;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
@@ -228,7 +229,10 @@ class Household implements RecipientInterface
     {
         if (!$this->clients->contains($client)) {
             $this->clients[] = $client;
-            $client->setHousehold($this);
+
+            $clientDto = ClientDto::create($client);
+            $clientDto->household = $this;
+            $client->update($clientDto);
         }
 
         return $this;
@@ -238,9 +242,12 @@ class Household implements RecipientInterface
     {
         if ($this->clients->contains($client)) {
             $this->clients->removeElement($client);
+
             // set the owning side to null (unless already changed)
             if ($client->getHousehold() === $this) {
-                $client->setHousehold(null);
+                $clientDto = ClientDto::create($client);
+                $clientDto->household = null;
+                $client->update($clientDto);
             }
         }
 

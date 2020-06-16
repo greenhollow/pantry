@@ -42,11 +42,11 @@ class ClientDto
     private $uuid;
 
     /**
-     * Construct with minimum required data.
+     * Construct with a client UUID.
      */
-    public function __construct(string $relationship)
+    public function __construct(?string $uuid = null)
     {
-        $this->relationship = $relationship;
+        $this->uuid = $uuid;
     }
 
     /**
@@ -54,8 +54,7 @@ class ClientDto
      */
     public static function create(Client $client): self
     {
-        $dto = new self($client->getRelationship());
-        $dto->uuid = $client->getUuid();
+        $dto = new self($client->getUuid());
 
         $dto->allergic = $client->getAllergic();
         $dto->diabetic = $client->getDiabetic();
@@ -64,6 +63,7 @@ class ClientDto
         $dto->gender = $client->getGender();
         $dto->household = $client->getHousehold();
         $dto->lastName = $client->getLastName();
+        $dto->relationship = $client->getRelationship();
         $dto->status = $client->getStatus();
 
         return $dto;
