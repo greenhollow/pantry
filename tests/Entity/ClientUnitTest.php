@@ -42,6 +42,20 @@ class ClientUnitTest extends BaseUnitTestCase
     }
 
     /**
+     * Verify the valid genders.
+     */
+    public function testGetGenders(): void
+    {
+        $this->assertSame(
+            [
+                'F',
+                'M',
+            ],
+            Client::getGenders()
+        );
+    }
+
+    /**
      * Verify the valid relations.
      */
     public function testGetRelations(): void

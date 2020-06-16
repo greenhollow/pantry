@@ -17,6 +17,12 @@ class Client implements RecipientInterface
     use RecipientTrait;
 
     /**
+     * Client genders
+     */
+    const GENDER_FEMALE = 'F';
+    const GENDER_MALE = 'M';
+
+    /**
      * Client relationships - expectation is that one client is designated the
      * "primary" and all others are designated in relation to the primary
      * - "family" is any relation not immediate (e.g. grandparent or in-law)
@@ -151,6 +157,17 @@ class Client implements RecipientInterface
     }
 
     /**
+     * Get all valid genders.
+     */
+    public static function getGenders(): array
+    {
+        return [
+            self::GENDER_FEMALE,
+            self::GENDER_MALE,
+        ];
+    }
+
+    /**
      * Get all valid relations.
      */
     public static function getRelations(): array
@@ -227,6 +244,11 @@ class Client implements RecipientInterface
      */
     public function validate(): void
     {
+        // check gender value
+        if ($this->gender && !in_array($this->gender, self::getGenders())) {
+            throw new ConstraintDefinitionException(sprintf('Invalid gender "%s" in %s; must be null or one of: %s', $this->gender, get_class(), implode(', ', self::getGenders())));
+        }
+
         // check relationship value
         if (!in_array($this->relationship, self::getRelations())) {
             throw new ConstraintDefinitionException(sprintf('Invalid relationship "%s" in %s; must be one of: %s', $this->relationship, get_class(), implode(', ', self::getRelations())));
