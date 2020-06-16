@@ -17,7 +17,7 @@ class Client implements RecipientInterface
     use RecipientTrait;
 
     /**
-     * Client genders
+     * Client genders.
      */
     const GENDER_FEMALE = 'F';
     const GENDER_MALE = 'M';

@@ -37,7 +37,7 @@ class HouseholdToUuidTransformer implements DataTransformerInterface
     /**
      * Transforms a UUID to a Household entity.
      *
-     * @throws TransformationFailedException if Household is not found.
+     * @throws TransformationFailedException if Household is not found
      */
     public function reverseTransform($uuid)
     {

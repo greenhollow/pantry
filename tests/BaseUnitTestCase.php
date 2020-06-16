@@ -28,7 +28,6 @@ class BaseUnitTestCase extends TestCase
      * Set a protected property's value by reflection.
      *
      * @param object $object
-     * @param string $property
      * @param mixed $value
      */
     protected function setPropertyValue($object, string $property, $value): ReflectionProperty
