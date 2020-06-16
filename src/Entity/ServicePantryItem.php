@@ -17,6 +17,12 @@ class ServicePantryItem
     private $id;
 
     /**
+     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\Column(type="guid")
+     */
+    private $uuid;
+
+    /**
      * @ORM\Column(type="integer")
      */
     private $qty;
@@ -36,6 +42,11 @@ class ServicePantryItem
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
     }
 
     public function getQty(): ?int

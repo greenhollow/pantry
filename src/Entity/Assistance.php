@@ -31,6 +31,12 @@ class Assistance
     private $id;
 
     /**
+     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\Column(type="guid")
+     */
+    private $uuid;
+
+    /**
      * @ORM\Column(type="datetimetz")
      */
     private $enabled;
@@ -133,6 +139,11 @@ class Assistance
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
     }
 
     public function getEnabled(): ?\DateTimeInterface

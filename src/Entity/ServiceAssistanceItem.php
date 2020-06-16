@@ -17,6 +17,12 @@ class ServiceAssistanceItem
     private $id;
 
     /**
+     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\Column(type="guid")
+     */
+    private $uuid;
+
+    /**
      * @ORM\Column(type="integer")
      */
     private $dollarsInCents;
@@ -41,6 +47,11 @@ class ServiceAssistanceItem
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
     }
 
     public function getDollarsInCents(): ?int

@@ -29,6 +29,12 @@ class PantryItem
     private $id;
 
     /**
+     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\Column(type="guid")
+     */
+    private $uuid;
+
+    /**
      * @ORM\Column(type="bigint", nullable=true)
      */
     private $barcode;
@@ -91,6 +97,11 @@ class PantryItem
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
     }
 
     public function getBarcode(): ?string

@@ -30,6 +30,12 @@ class ServicePantryStatus
     private $id;
 
     /**
+     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\Column(type="guid")
+     */
+    private $uuid;
+
+    /**
      * @ORM\Column(type="datetimetz")
      */
     private $created;
@@ -80,6 +86,11 @@ class ServicePantryStatus
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
     }
 
     public function getCreated(): ?\DateTimeInterface
